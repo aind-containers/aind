@@ -1,0 +1,16 @@
+[Unit]
+Description=Anbox Container Manager
+After=network.target
+Wants=network.target
+
+[Service]
+ExecStartPre=/sbin/modprobe ashmem_linux
+ExecStartPre=/sbin/modprobe binder_linux
+ExecStartPre=mkdir -p /dev/binderfs
+ExecStartPre=mount -t binder none /dev/binderfs
+ExecStartPre=/usr/local/share/anbox/anbox-bridge.sh start
+ExecStart=/usr/local/bin/anbox container-manager --daemon --data-path=/var/lib/anbox --android-image=/android.img --use-rootfs-overlay
+ExecStopPost=/usr/local/share/anbox/anbox-bridge.sh stop
+
+[Install]
+WantedBy=docker-entrypoint.target
