@@ -4,6 +4,8 @@ AinD launches Android apps in Docker, by nesting [Anbox](https://anbox.io/) cont
 
 Unlike VM-based similar projects, AinD can be executed on IaaS instances without support for nested virtualization.
 
+Docker Hub: [`aind/aind`](https://hub.docker.com/r/aind/aind)
+
 ## Purposes
 * Anti-theft
 * Android compatibility (via cloud) for iOS and Windows tablets
@@ -53,11 +55,7 @@ sudo modprobe binder_linux
 ```
 
 ```bash
-docker build -t akihirosuda/aind .
-```
-
-```bash
-docker run -d --name aind --privileged -p 5900:5900 -v /lib/modules:/lib/modules:ro akihirosuda/aind
+docker run -d --name aind --privileged -p 5900:5900 -v /lib/modules:/lib/modules:ro aind/aind
 ```
 
 Connect to `5900` via `vncviewer`.
