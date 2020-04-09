@@ -104,10 +104,10 @@ COPY --from=anbox /anbox/build/src/anbox /usr/local/bin/anbox
 COPY --from=anbox /anbox/scripts/anbox-bridge.sh /usr/local/share/anbox/anbox-bridge.sh
 COPY --from=anbox /anbox/data/ui /usr/local/share/anbox/ui
 RUN ldconfig
-ADD anbox-container-manager.service /lib/systemd/system/anbox-container-manager.service
+ADD src/anbox-container-manager.service /lib/systemd/system/anbox-container-manager.service
 RUN systemctl enable anbox-container-manager
-ADD unsudo /usr/local/bin
-ADD docker-2ndboot.sh  /home/user
+ADD src/unsudo /usr/local/bin
+ADD src/docker-2ndboot.sh  /home/user
 VOLUME /var/lib/anbox
 ENTRYPOINT ["/docker-entrypoint.sh", "unsudo"]
 EXPOSE 5900
