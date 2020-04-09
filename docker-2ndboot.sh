@@ -12,6 +12,7 @@ x11vnc &
 
 : FIXME
 sleep 5
+fvwm &
 anbox session-manager &
 
 : FIXME

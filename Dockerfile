@@ -90,6 +90,8 @@ RUN apt-get update && \
   dbus dbus-user-session systemd systemd-container systemd-sysv \
 # X11
   xvfb x11vnc \
+# WM
+  fvwm xterm \
 # debug utilities
   busybox file strace less && \
 # ...
