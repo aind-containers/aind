@@ -55,7 +55,7 @@ sudo modprobe binder_linux
 ```
 
 ```bash
-docker run -d --name aind --privileged -p 5900:5900 -v /lib/modules:/lib/modules:ro aind/aind
+docker run -td --name aind --privileged -p 5900:5900 -v /lib/modules:/lib/modules:ro aind/aind
 ```
 
 Connect to `5900` via `vncviewer`.
