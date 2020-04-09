@@ -1,0 +1,9 @@
+name: Main
+on: [push, pull_request]
+jobs:
+  test-main:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - run: DOCKER_BUILDKIT=1 docker build -t aind .
+# TODO: capture screenshot and upload as an artifact
