@@ -58,13 +58,34 @@ sudo modprobe binder_linux
 docker run -td --name aind --privileged -p 5900:5900 -v /lib/modules:/lib/modules:ro aind/aind
 ```
 
-> NOTE: `--privileged` is required for nesting an Anbox (LXC) inside Docker. But you don't need to worry too much because Anbox launches "unprivileged" LXC using user namespaces. You can confirm that all Android processes are running as non-root users, by executing `docker exec aind ps -ef`.
+> **NOTE**: `--privileged` is required for nesting an Anbox (LXC) inside Docker. But you don't need to worry too much because Anbox launches "unprivileged" LXC using user namespaces. You can confirm that all Android processes are running as non-root users, by executing `docker exec aind ps -ef`.
 
 Wait for 10-20 seconds until Android processes are shown up in `docker exec aind ps -ef`, and then connect to `5900` via `vncviewer`.
 
 If the application manager doesn't shown up on the VNC screen, try `docker run ...` several times (FIXME).  Also make sure to check `docker logs aind`.
 
 Future version will support connection from Web browsers (of phones and tablets) without VNC.
+
+### Kubernetes
+
+```bash
+kubectl apply -f kube/aind.yaml
+kubectl port-forward service/aind 5900
+```
+
+The manifest contains the kernel module installer as `initContainers`.
+
+Known to work on:
+- Google Kubernetes Engine (GKE) 1.16.8-gke.4 (ubuntu)
+- Google Kubernetes Engine (GKE) 1.16.8-gke.4 (ubuntu\_containerd)
+- Azure Kubernetes Service (AKS) 1.17.3
+
+Known NOT to work on:
+- kind 0.7.0
+
+**FIXME**: `hostNetwork` is required on Kubernetes (not on non-Kube Docker) for some unknown reason. This disables running multiple aind pods on a single node!
+
+## Apps
 
 ### Pre-installed Apps
 * Firefox

@@ -5,8 +5,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+# host info
     - run: docker info
     - run: docker version
+    - run: cat /proc/cpuinfo
+# test
     - run: DOCKER_BUILDKIT=1 docker build -t aind/aind:local .
     - run: sudo ./hack/install-kmod.sh
     - run: docker run -td --name aind --privileged -p 5900:5900 -v /lib/modules:/lib/modules:ro aind/aind:local
