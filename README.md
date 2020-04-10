@@ -7,7 +7,7 @@ Unlike VM-based similar projects, AinD can be executed on IaaS instances without
 Docker Hub: [`aind/aind`](https://hub.docker.com/r/aind/aind)
 
 ## Purposes
-* Anti-theft
+* Anti-theft (see [FAQ](#faq))
 * Android compatibility (via cloud) for iOS and Windows tablets
 
 ### Non-goals
@@ -77,6 +77,19 @@ APK files mounted as `/apk.d/*.apk` are automatically installed on start up.
 
 You can also use [F-Droid](https://f-droid.org/).
 To use F-Droid, enable "Settings" -> "Security" -> "Allow installation of apps from unknown sources".
+
+### Troubleshooting
+
+* `docker logs aind`
+* `docker exec -it aind systemctl status anbox-container-manager`
+* `docker exec -it aind ps -ef`
+* `docker exec -it aind cat /var/lib/anbox/logs/console.log`
+
+## FAQ
+### Isn't encrypting the phone with strong passcode is enough for anti-theft? Why do we need aind?
+People in th real world are likely to set weak passcode like "1234" (or finger pattern), because they want to open email/phone/twitter/maps/payment apps in just a few seconds.
+
+aind is expected to be in conjunction with encryption, and to be used only for sensitive apps, with more strong passcode.
 
 ## TODOs
 * Map different UID range per containers
