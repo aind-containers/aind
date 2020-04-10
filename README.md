@@ -58,17 +58,24 @@ sudo modprobe binder_linux
 docker run -td --name aind --privileged -p 5900:5900 -v /lib/modules:/lib/modules:ro aind/aind
 ```
 
+> NOTE: `--privileged` is required for nesting an Anbox (LXC) inside Docker. But you don't need to worry too much because Anbox launches "unprivileged" LXC using user namespaces. You can confirm that all Android process are running as non-root users, by executing `docker exec aind ps -ef`.
+
 Connect to `5900` via `vncviewer`.
 
-Future version will support noVNC.
+Future version will support connection from Web browsers without VNC.
 
 ### Installing apk packages
 
-Use `adb` (TBD).
+Use `adb install` (To be documented).
+
+You can also use [F-Droid](https://f-droid.org/).
+
+F-Droid will be installed by default soon.
+
 
 ## TODOs
 * Map different UID range per containers
-* Support noVNC (VNC over Web browsers) w/ TLS
+* Support remote connection from phones and tablets, ideally using Web browsers (noVNC?).
 * Better touch screen experience
 * Redirect camera, notifications, ...
 
