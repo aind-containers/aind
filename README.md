@@ -66,6 +66,11 @@ If the application manager doesn't shown up on the VNC screen, try `docker run .
 
 Future version will support connection from Web browsers (of phones and tablets) without VNC.
 
+### Pre-installed Apps
+* Firefox
+* F-Droid
+* Misc accessories like Clock and Calculator
+
 ### Installing apk packages
 
 APK files mounted as `/apk.d/*.apk` are automatically installed on start up.
