@@ -42,7 +42,7 @@ user         448     154  0 11:18 pts/2    00:00:00 com.android.settings
 root        1003       0  0 11:25 ?        00:00:00 ps -ef
 ```
 
-![docs/screenshot.png](docs/screenshot.png)
+![docs/screenshot.png](docs/screenshot-20200410.png)
 
 ## Quick start
 Tested on Ubuntu 19.10 (Kernel 5.3).
