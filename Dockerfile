@@ -93,7 +93,7 @@ RUN apt-get update && \
 # WM
   fvwm xterm \
 # debug utilities
-  busybox file strace less && \
+  busybox figlet file strace less && \
 # ...
   useradd --create-home --home-dir /home/user --uid 1000 -G systemd-journal user  && \
   curl -L -o /docker-entrypoint.sh https://raw.githubusercontent.com/AkihiroSuda/containerized-systemd/6ced78a9df65c13399ef1ce41c0bedc194d7cff6/docker-entrypoint.sh && \
@@ -108,6 +108,10 @@ ADD src/anbox-container-manager.service /lib/systemd/system/anbox-container-mana
 RUN systemctl enable anbox-container-manager
 ADD src/unsudo /usr/local/bin
 ADD src/docker-2ndboot.sh  /home/user
+# apk-pre.d is for pre-installed apks, /apk.d for the mountpoint for user-specific apks
+RUN mkdir -p /apk-pre.d /apk.d
+ADD https://f-droid.org/FDroid.apk /apk-pre.d
+RUN chmod 444 /apk-pre.d/*
 VOLUME /var/lib/anbox
 ENTRYPOINT ["/docker-entrypoint.sh", "unsudo"]
 EXPOSE 5900

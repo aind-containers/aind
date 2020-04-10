@@ -60,18 +60,18 @@ docker run -td --name aind --privileged -p 5900:5900 -v /lib/modules:/lib/module
 
 > NOTE: `--privileged` is required for nesting an Anbox (LXC) inside Docker. But you don't need to worry too much because Anbox launches "unprivileged" LXC using user namespaces. You can confirm that all Android process are running as non-root users, by executing `docker exec aind ps -ef`.
 
-Connect to `5900` via `vncviewer`.
+Wait for 10-20 seconds until Android processes are shown up in `docker exec aind ps -ef`, and then connect to `5900` via `vncviewer`.
 
-Future version will support connection from Web browsers without VNC.
+If the application manager doesn't shown up on the VNC screen, try `docker run ...` several times (FIXME).  Also make sure to check `docker logs aind`.
+
+Future version will support connection from Web browsers (of phones and tablets) without VNC.
 
 ### Installing apk packages
 
-Use `adb install` (To be documented).
+APK files mounted as `/apk.d/*.apk` are automatically installed on start up.
 
 You can also use [F-Droid](https://f-droid.org/).
-
-F-Droid will be installed by default soon.
-
+To use F-Droid, enable "Settings" -> "Security" -> "Allow installation of apps from unknown sources".
 
 ## TODOs
 * Map different UID range per containers
