@@ -20,7 +20,10 @@ x11vnc &
 : FIXME: remove this sleep
 sleep 1
 fvwm &
-systemctl is-system-running --wait
+if ! systemctl is-system-running --wait; then
+    systemctl status anbox-container-manager --no-pager
+    exit 1
+fi
 systemctl status anbox-container-manager --no-pager
 
 anbox session-manager &
