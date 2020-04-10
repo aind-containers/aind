@@ -58,7 +58,7 @@ sudo modprobe binder_linux
 docker run -td --name aind --privileged -p 5900:5900 -v /lib/modules:/lib/modules:ro aind/aind
 ```
 
-> NOTE: `--privileged` is required for nesting an Anbox (LXC) inside Docker. But you don't need to worry too much because Anbox launches "unprivileged" LXC using user namespaces. You can confirm that all Android process are running as non-root users, by executing `docker exec aind ps -ef`.
+> NOTE: `--privileged` is required for nesting an Anbox (LXC) inside Docker. But you don't need to worry too much because Anbox launches "unprivileged" LXC using user namespaces. You can confirm that all Android processes are running as non-root users, by executing `docker exec aind ps -ef`.
 
 Wait for 10-20 seconds until Android processes are shown up in `docker exec aind ps -ef`, and then connect to `5900` via `vncviewer`.
 
@@ -86,10 +86,10 @@ To use F-Droid, enable "Settings" -> "Security" -> "Allow installation of apps f
 * `docker exec -it aind cat /var/lib/anbox/logs/console.log`
 
 ## FAQ
-### Isn't encrypting the phone with strong passcode is enough for anti-theft? Why do we need aind?
+### Isn't encrypting the phone with strong passcode enough for anti-theft? Why do we need aind?
 People in th real world are likely to set weak passcode like "1234" (or finger pattern), because they want to open email/phone/twitter/maps/payment apps in just a few seconds.
 
-aind is expected to be in conjunction with encryption, and to be used only for sensitive apps, with more strong passcode.
+aind is expected to be used in conjunction with encryption, and to be used only for sensitive apps, with more strong passcode.
 
 ## TODOs
 * Map different UID range per containers
