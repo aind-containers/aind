@@ -111,6 +111,7 @@ ADD src/docker-2ndboot.sh  /home/user
 # apk-pre.d is for pre-installed apks, /apk.d for the mountpoint for user-specific apks
 RUN mkdir -p /apk-pre.d /apk.d
 ADD https://f-droid.org/FDroid.apk /apk-pre.d
+ADD https://ftp.mozilla.org/pub/mobile/releases/68.7.0/android-x86_64/en-US/fennec-68.7.0.en-US.android-x86_64.apk /apk-pre.d
 RUN chmod 444 /apk-pre.d/*
 VOLUME /var/lib/anbox
 ENTRYPOINT ["/docker-entrypoint.sh", "unsudo"]
