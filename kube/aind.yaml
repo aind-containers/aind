@@ -1,0 +1,83 @@
+# aind manifest for Kubernetes
+#
+# Known to work on GKE (Ubuntu) and AKS.
+# Known NOT to work on kind.
+#
+# See also FIXME and NOTE lines.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: aind
+  name: aind
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aind
+  template:
+    metadata:
+      labels:
+        app: aind
+    spec:
+# FIXME: hostNetwork is required on Kubernetes (not on non-Kube Docker) for some unknown reason.
+# This disables running multiple aind pods on a single node!
+# https://github.com/aind-containers/aind/pull/8
+      hostNetwork: true
+      initContainers:
+      - name: install-kmod
+# NOTE: replace "aind/aind:latest" with "aind/aind@sha256:<digest>" for reproducible deployment.
+        image: aind/aind:latest
+        command: ["/bin/bash"]
+        args: ["-exc", "cp -f /install-kmod.sh /host/tmp/aind-install-kmod.sh && cd /host && chroot . bash /tmp/aind-install-kmod.sh"]
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: host-root
+          mountPath: /host
+      containers:
+      - name: aind
+# NOTE: replace "aind/aind:latest" with "aind/aind@sha256:<digest>" for reproducible deployment.
+        image: aind/aind:latest
+        tty: true
+        securityContext:
+          privileged: true
+        ports:
+        - containerPort: 5900
+        volumeMounts:
+        - name: host-lib-modules
+          readOnly: true
+          mountPath: /lib/modules
+        resources:
+          requests:
+            memory: 2048m
+            cpu: 500m
+        livenessProbe:
+          exec:
+            command: ["pgrep", "-f", "org.anbox.appmgr"]
+          initialDelaySeconds: 20
+          periodSeconds: 15
+      volumes:
+      - name: host-root
+        hostPath:
+          path: /
+      - name: host-lib-modules
+        hostPath:
+          path: /lib/modules
+# NOTE: Set the following nodeSelector if you have non-Ubuntu (i.e. cos) node pools on GKE
+#    nodeSelector:
+#      cloud.google.com/gke-os-distribution: ubuntu
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: aind
+  name: aind
+spec:
+  ports:
+  - port: 5900
+    protocol: TCP
+  selector:
+    app: aind
