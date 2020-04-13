@@ -6,19 +6,19 @@ if [ $(id -u) != 0 ]; then
 	echo >&2 "must be executed as root"
 	exit 1
 fi
-if [ -f /dev/ashmem ]; then
+if [ -e /dev/ashmem ]; then
 	if grep binder /proc/filesystem; then
 		echo "ashmem and binderfs are already enabled. Skipping install modules."
 		exit 0
 	fi
-	if [ -f /dev/binder ]; then
+	if [ -e /dev/binder ]; then
 		echo "ashmem and binder (classic) are already enabled. Skipping install modules."
 		exit 0
 	fi
 fi
 # TODO: support non-Ubuntu
 apt-get update
-apt-get install -q -y dkms linux-headers-generic
+apt-get install -q -y dkms git linux-headers-generic
 tmp=$(mktemp -d aind-kmod-install.XXXXXXXXXX --tmpdir)
 git clone https://github.com/anbox/anbox-modules $tmp/anbox-modules
 (
