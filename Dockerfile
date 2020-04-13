@@ -79,7 +79,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
   apt-get install -qq -y --no-install-recommends \
 # base system
-  ca-certificates curl iproute2 kmod \
+  ca-certificates curl iproute2 jq kmod \
 # lxc deps
   iptables libcap2 libseccomp2 libselinux1 \
 # anbox deps
@@ -99,21 +99,26 @@ RUN apt-get update && \
   curl -L -o /docker-entrypoint.sh https://raw.githubusercontent.com/AkihiroSuda/containerized-systemd/6ced78a9df65c13399ef1ce41c0bedc194d7cff6/docker-entrypoint.sh && \
   chmod +x /docker-entrypoint.sh
 COPY --from=lxc /usr/local /usr/local/
-COPY --from=android-img /android.img /android.img
+COPY --from=android-img /android.img /aind-android.img
 COPY --from=anbox /anbox/build/src/anbox /usr/local/bin/anbox
 COPY --from=anbox /anbox/scripts/anbox-bridge.sh /usr/local/share/anbox/anbox-bridge.sh
 COPY --from=anbox /anbox/data/ui /usr/local/share/anbox/ui
 RUN ldconfig
+ADD src/anbox-container-manager-pre.sh /usr/local/bin/anbox-container-manager-pre.sh
 ADD src/anbox-container-manager.service /lib/systemd/system/anbox-container-manager.service
 RUN systemctl enable anbox-container-manager
 ADD src/unsudo /usr/local/bin
 ADD src/docker-2ndboot.sh  /home/user
+# Usage: docker run --rm --privileged -v /:/host --entrypoint bash aind/aind -exc "cp -f /install-kmod.sh /host/aind-install-kmod.sh && cd /host && chroot . /aind-install-kmod.sh"
+ADD hack/install-kmod.sh /
 # apk-pre.d is for pre-installed apks, /apk.d for the mountpoint for user-specific apks
-RUN mkdir -p /apk-pre.d /apk.d
-ADD https://f-droid.org/FDroid.apk /apk-pre.d
-ADD https://ftp.mozilla.org/pub/mobile/releases/68.7.0/android-x86_64/en-US/fennec-68.7.0.en-US.android-x86_64.apk /apk-pre.d
-RUN chmod 444 /apk-pre.d/*
+RUN mkdir -p /apk-pre.d /apk.d && \
+  curl -L -o /apk-pre.d/FDroid.apk https://f-droid.org/FDroid.apk && \
+  curl -L -o /apk-pre.d/firefox.apk https://ftp.mozilla.org/pub/mobile/releases/68.7.0/android-x86_64/en-US/fennec-68.7.0.en-US.android-x86_64.apk && \
+  chmod 444 /apk-pre.d/*
 VOLUME /var/lib/anbox
 ENTRYPOINT ["/docker-entrypoint.sh", "unsudo"]
 EXPOSE 5900
+HEALTHCHECK --interval=15s --timeout=10s --start-period=60s --retries=5 \
+  CMD ["pgrep", "-f", "org.anbox.appmgr"]
 CMD ["/home/user/docker-2ndboot.sh"]

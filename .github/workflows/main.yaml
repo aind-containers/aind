@@ -5,5 +5,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - run: DOCKER_BUILDKIT=1 docker build -t aind .
+    - run: docker info
+    - run: docker version
+    - run: DOCKER_BUILDKIT=1 docker build -t aind/aind:local .
+    - run: sudo ./hack/install-kmod.sh
+    - run: docker run -td --name aind --privileged -p 5900:5900 -v /lib/modules:/lib/modules:ro aind/aind:local
+    - run: timeout 60 sh -exc "until docker exec aind pgrep -f org.anbox.appmgr; do sleep 10; done"
+# diagnosis
+    - run: docker exec aind ps -ef
+      if: always()
+    - run: docker logs aind
+      if: always()
+    - run: docker exec aind cat /var/lib/anbox/logs/console.log
+      if: always()
 # TODO: capture screenshot and upload as an artifact

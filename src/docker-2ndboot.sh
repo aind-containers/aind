@@ -2,8 +2,8 @@
 # docker-2ndboot.sh is executed as a non-root user via `unsudo`.
 
 function finish {
+    set +x
     figlet ERROR
-    echo "ERROR: failed!"
     : FIXME: the container should shutdown automatically here
 }
 trap finish EXIT
@@ -21,10 +21,11 @@ x11vnc &
 sleep 1
 fvwm &
 if ! systemctl is-system-running --wait; then
-    systemctl status anbox-container-manager --no-pager
+    systemctl status --no-pager -l anbox-container-manager
+    journalctl -u anbox-container-manager --no-pager -l
     exit 1
 fi
-systemctl status anbox-container-manager --no-pager
+systemctl status --no-pager -l anbox-container-manager
 
 anbox session-manager &
 until anbox wait-ready; do sleep 1; done
