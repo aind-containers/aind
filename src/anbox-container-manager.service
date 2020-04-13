@@ -4,12 +4,9 @@ After=network.target
 Wants=network.target
 
 [Service]
-ExecStartPre=/sbin/modprobe ashmem_linux
-ExecStartPre=/sbin/modprobe binder_linux
-# newer kernel uses /dev/binderfs directory instead of /dev/binder file
-ExecStartPre=sh -exc "[ -f /dev/binder ] || (mkdir -p /dev/binderfs && mount -t binder none /dev/binderfs)"
+ExecStartPre=/usr/local/bin/anbox-container-manager-pre.sh
 ExecStartPre=/usr/local/share/anbox/anbox-bridge.sh start
-ExecStart=/usr/local/bin/anbox container-manager --daemon --data-path=/var/lib/anbox --android-image=/android.img --use-rootfs-overlay
+ExecStart=/usr/local/bin/anbox container-manager --daemon --data-path=/var/lib/anbox --android-image=/aind-android.img --use-rootfs-overlay
 ExecStopPost=/usr/local/share/anbox/anbox-bridge.sh stop
 
 [Install]
