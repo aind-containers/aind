@@ -10,13 +10,19 @@ trap finish EXIT
 
 cd $(realpath $(dirname $0)/..)
 set -eux
+
+mkdir -p ~/.vnc
+if [ ! -e ~/.vnc/passwdfile ]; then
+    echo $(head /dev/urandom | tr -dc a-z0-9 | head -c 32) > ~/.vnc/passwdfile
+fi
+
 Xvfb &
 export DISPLAY=:0
 
 until [ -e /tmp/.X11-unix/X0 ]; do sleep 1; done
 : FIXME: remove this sleep
 sleep 1
-x11vnc &
+x11vnc -usepw &
 : FIXME: remove this sleep
 sleep 1
 fvwm &
@@ -43,5 +49,5 @@ fi
 
 # done
 figlet "Ready"
-ps -ef
+echo "Hint: the password is stored in $HOME/.vnc/passwdfile"
 exec sleep infinity
