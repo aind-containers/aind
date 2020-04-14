@@ -8,11 +8,11 @@ if [ $(id -u) != 0 ]; then
 fi
 if [ -e /dev/ashmem ]; then
 	if grep binder /proc/filesystems; then
-		echo "ashmem and binderfs are already enabled. Skipping install modules."
+		echo "ashmem and binderfs are already enabled. Skipping installing modules."
 		exit 0
 	fi
 	if [ -e /dev/binder ]; then
-		echo "ashmem and binder (classic) are already enabled. Skipping install modules."
+		echo "ashmem and binder (classic) are already enabled. Skipping installing modules."
 		exit 0
 	fi
 fi

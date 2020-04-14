@@ -98,6 +98,11 @@ RUN apt-get update && \
   useradd --create-home --home-dir /home/user --uid 1000 -G systemd-journal user  && \
   curl -L -o /docker-entrypoint.sh https://raw.githubusercontent.com/AkihiroSuda/containerized-systemd/6ced78a9df65c13399ef1ce41c0bedc194d7cff6/docker-entrypoint.sh && \
   chmod +x /docker-entrypoint.sh
+# apk-pre.d is for pre-installed apks, /apk.d for the mountpoint for user-specific apks
+RUN mkdir -p /apk-pre.d /apk.d && \
+  curl -L -o /apk-pre.d/FDroid.apk https://f-droid.org/FDroid.apk && \
+  curl -L -o /apk-pre.d/firefox.apk https://ftp.mozilla.org/pub/mobile/releases/68.7.0/android-x86_64/en-US/fennec-68.7.0.en-US.android-x86_64.apk && \
+  chmod 444 /apk-pre.d/*
 COPY --from=lxc /usr/local /usr/local/
 COPY --from=android-img /android.img /aind-android.img
 COPY --from=anbox /anbox/build/src/anbox /usr/local/bin/anbox
@@ -111,11 +116,6 @@ ADD src/unsudo /usr/local/bin
 ADD src/docker-2ndboot.sh  /home/user
 # Usage: docker run --rm --privileged -v /:/host --entrypoint bash aind/aind -exc "cp -f /install-kmod.sh /host/aind-install-kmod.sh && cd /host && chroot . /aind-install-kmod.sh"
 ADD hack/install-kmod.sh /
-# apk-pre.d is for pre-installed apks, /apk.d for the mountpoint for user-specific apks
-RUN mkdir -p /apk-pre.d /apk.d && \
-  curl -L -o /apk-pre.d/FDroid.apk https://f-droid.org/FDroid.apk && \
-  curl -L -o /apk-pre.d/firefox.apk https://ftp.mozilla.org/pub/mobile/releases/68.7.0/android-x86_64/en-US/fennec-68.7.0.en-US.android-x86_64.apk && \
-  chmod 444 /apk-pre.d/*
 VOLUME /var/lib/anbox
 ENTRYPOINT ["/docker-entrypoint.sh", "unsudo"]
 EXPOSE 5900

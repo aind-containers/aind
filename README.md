@@ -68,6 +68,13 @@ If the application manager doesn't shown up on the VNC screen, try `docker run .
 
 Future version will support connection from Web browsers (of phones and tablets) without VNC.
 
+### Troubleshooting
+
+* `docker logs aind`
+* `docker exec -it aind systemctl status anbox-container-manager`
+* `docker exec -it aind ps -ef`
+* `docker exec -it aind cat /var/lib/anbox/logs/console.log`
+
 ### Kubernetes
 
 ```bash
@@ -100,13 +107,6 @@ APK files mounted as `/apk.d/*.apk` are automatically installed on start up.
 
 You can also use [F-Droid](https://f-droid.org/).
 To use F-Droid, enable "Settings" -> "Security" -> "Allow installation of apps from unknown sources".
-
-### Troubleshooting
-
-* `docker logs aind`
-* `docker exec -it aind systemctl status anbox-container-manager`
-* `docker exec -it aind ps -ef`
-* `docker exec -it aind cat /var/lib/anbox/logs/console.log`
 
 ## FAQ
 ### Isn't encrypting the phone with strong passcode enough for anti-theft? Why do we need aind?
