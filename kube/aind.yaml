@@ -1,9 +1,8 @@
 # aind manifest for Kubernetes
 #
-# Known to work on GKE (Ubuntu) and AKS.
-# Known NOT to work on kind.
+# See README.md for the clusters known to work with.
 #
-# See also FIXME and NOTE lines.
+# NOTE: replace "aind/aind:latest" with "aind/aind@sha256:<digest>" for reproducible deployment.
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -21,13 +20,8 @@ spec:
       labels:
         app: aind
     spec:
-# FIXME: hostNetwork is required on Kubernetes (not on non-Kube Docker) for some unknown reason.
-# This disables running multiple aind pods on a single node!
-# https://github.com/aind-containers/aind/pull/8
-      hostNetwork: true
       initContainers:
       - name: install-kmod
-# NOTE: replace "aind/aind:latest" with "aind/aind@sha256:<digest>" for reproducible deployment.
         image: aind/aind:latest
         command: ["/bin/bash"]
         args: ["-exc", "cp -f /install-kmod.sh /host/tmp/aind-install-kmod.sh && cd /host && chroot . bash /tmp/aind-install-kmod.sh"]
@@ -36,9 +30,17 @@ spec:
         volumeMounts:
         - name: host-root
           mountPath: /host
+ # Remounting /sys as read-write in initContainers propagates to the Pod sandbox and the containers.
+ # Required by anbox session-manager.
+ # https://github.com/aind-containers/aind/issues/21 https://github.com/containerd/containerd/issues/3221 https://github.com/moby/moby/issues/24000#issuecomment-613194003
+      - name: fix-sandbox-sysfs
+        image: aind/aind:latest
+        command: ["/bin/bash"]
+        args: ["-exc", "mount -o remount,rw /sys"]
+        securityContext:
+          privileged: true
       containers:
       - name: aind
-# NOTE: replace "aind/aind:latest" with "aind/aind@sha256:<digest>" for reproducible deployment.
         image: aind/aind:latest
         tty: true
         securityContext:

@@ -84,15 +84,19 @@ kubectl port-forward service/aind 5900
 
 The manifest contains the kernel module installer as `initContainers`.
 
-Known to work on:
-- Google Kubernetes Engine (GKE) 1.16.8-gke.4 (ubuntu)
-- Google Kubernetes Engine (GKE) 1.16.8-gke.4 (ubuntu\_containerd)
-- Azure Kubernetes Service (AKS) 1.17.3
-
-Known NOT to work on:
-- kind 0.7.0
-
-**FIXME**: `hostNetwork` is required on Kubernetes (not on non-Kube Docker) for some unknown reason. This disables running multiple aind pods on a single node!
+The manifest is known to work on:
+- Google Kubernetes Engine (GKE) 1.16.8-gke.8 (ubuntu) [Apr 14, 2020]
+  - Kubernetes 1.16.8, Ubuntu 18.04.4, Kernel 5.3.0-1012-gke, Docker 19.03.2
+  - n2-standard-8
+- Google Kubernetes Engine (GKE) 1.16.8-gke.8 (ubuntu\_containerd) [Apr 14, 2020]
+  - Kubernetes 1.16.8, Ubuntu 18.04.4, Kernel 5.3.0-1012-gke, containerd 1.2.10
+  - n2-standard-8
+- Azure Kubernetes Service (AKS) 1.17.3 [Apr 14, 2020]
+  - Kubernetes 1.17.3, Ubuntu 16.04.6, Kernel 4.15.0-1071-azure, MS-Moby 3.0.10+azure
+  - Standard DS2 v2
+- kind 0.7.0 [Apr 14, 2020]
+  - Kubernetes 1.17.0, Ubuntu 19.10, Kernel 5.3.0-46-generic, containerd 1.3.2
+  - **NOTE**: Requires `docker exec kind-control-plane mount -o remount,rw /sys`
 
 ## Apps
 
