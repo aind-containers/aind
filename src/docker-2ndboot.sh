@@ -13,7 +13,9 @@ set -eux
 
 mkdir -p ~/.vnc
 if [ ! -e ~/.vnc/passwdfile ]; then
+    set +x
     echo $(head /dev/urandom | tr -dc a-z0-9 | head -c 32) > ~/.vnc/passwdfile
+    set -x
 fi
 
 Xvfb &
