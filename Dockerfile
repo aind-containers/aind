@@ -1,7 +1,7 @@
 ARG BASE=ubuntu:20.04
 
-# Apr 7, 2020
-ARG ANBOX_COMMIT=6d9ada9d10348589a03d8101e7cb9f50d6d0b5fb
+# Apr 14, 2020
+ARG ANBOX_COMMIT=1edeb4f07941aaa65624cea59f1f77c314ad1b97
 
 # Apr 7, 2020
 # NOTE: we can't use lxc 4.0.1 dpkg because of https://github.com/lxc/lxc/issues/3363
@@ -51,6 +51,11 @@ RUN git clone https://github.com/anbox/anbox /anbox
 WORKDIR /anbox
 ARG ANBOX_COMMIT
 RUN git pull && git checkout ${ANBOX_COMMIT}
+COPY ./src/patches/anbox /patches
+# `git am` requires user info to be set
+RUN git config user.email "nobody@example.com" && \
+  git config user.name "AinD Build Script" && \
+  git am /patches/* && git show --summary
 RUN mkdir build && \
   cd build && \
   cmake .. && \
@@ -84,6 +89,8 @@ RUN apt-get update && \
   iptables libcap2 libseccomp2 libselinux1 \
 # anbox deps
   libboost-log1.71.0  libboost-thread1.71.0 libboost-program-options1.71.0 libboost-iostreams1.71.0 libboost-filesystem1.71.0 libegl1-mesa libgles2-mesa libprotobuf-lite17 libsdl2-2.0-0 libsdl2-image-2.0-0 \
+# squashfuse
+  squashfuse fuse3 \
 # adb
   adb \
 # systemd
