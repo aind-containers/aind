@@ -6,6 +6,10 @@ if [ $(id -u) != 0 ]; then
 	echo >&2 "must be executed as root"
 	exit 1
 fi
+set +e
+/sbin/modprobe ashmem_linux
+/sbin/modprobe binder_linux
+set -e
 if [ -e /dev/ashmem ]; then
 	if grep binder /proc/filesystems; then
 		echo "ashmem and binderfs are already enabled. Skipping installing modules."
@@ -16,9 +20,25 @@ if [ -e /dev/ashmem ]; then
 		exit 0
 	fi
 fi
-# TODO: support non-Ubuntu
-apt-get update
-apt-get install -q -y dkms git linux-headers-generic
+
+if command -v apt-get >/dev/null 2>&1; then
+	apt-get update
+	(
+		source /etc/os-release
+		if [[ $ID = "ubuntu" || $ID_LIKE =~ "ubuntu" ]]; then
+			apt-get install -q -y dkms git linux-headers-generic
+		else
+			apt-get install -q -y dkms git linux-headers-amd64
+		fi
+	)
+elif command -v zypper >/dev/null 2>&1; then
+	zypper install -y dkms git kernel-default-devel
+elif command -v dnf >/dev/null 2>&1; then
+	dnf install -y dkms git kernel-devel
+elif command -v yum >/dev/null 2>&1; then
+	yum install -y dkms git kernel-devel
+fi
+
 tmp=$(mktemp -d aind-kmod-install.XXXXXXXXXX --tmpdir)
 git clone https://github.com/anbox/anbox-modules $tmp/anbox-modules
 (
