@@ -98,6 +98,22 @@ The manifest is known to work on:
   - Kubernetes 1.17.0, Ubuntu 19.10, Kernel 5.3.0-46-generic, containerd 1.3.2
   - **NOTE**: Requires `docker exec kind-control-plane mount -o remount,rw /sys`
 
+## Tips
+
+### adb
+
+```bash
+docker exec -it aind adb shell
+```
+
+To run adb on the host:
+
+```
+socat TCP-LISTEN:5037,reuseaddr,fork 'EXEC:docker exec -i aind  "socat STDIO TCP-CONNECT:localhost:5037"' &
+adb connect localhost:5037
+adb shell
+```
+
 ## Apps
 
 ### Pre-installed Apps
