@@ -79,7 +79,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
   apt-get install -qq -y --no-install-recommends \
 # base system
-  ca-certificates curl iproute2 jq kmod \
+  ca-certificates curl iproute2 jq kmod socat \
 # lxc deps
   iptables libcap2 libseccomp2 libselinux1 \
 # anbox deps
