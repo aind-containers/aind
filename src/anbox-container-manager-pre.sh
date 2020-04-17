@@ -5,11 +5,6 @@ if [ $(id -u) != 0 ]; then
 	exit 1
 fi
 
-# clean up orphan loop devices
-if losetup | grep /aind-android.img; then
-	losetup -J | jq -r '.loopdevices[] | select (."back-file" == "/aind-android.img") | .name' | xargs losetup -d
-fi
-
 # ashmem
 /sbin/modprobe ashmem_linux
 if [ ! -e /dev/ashmem ]; then
