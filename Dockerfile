@@ -1,11 +1,10 @@
+# this dockerfile can be translated to `docker/dockerfile:1-experimental` syntax for enabling cache mounts:
+# $ ./hack/translate-dockerfile-runopt-directive.sh < Dockerfile | DOCKER_BUILDKIT=1 docker build -f -  .
+
 ARG BASE=ubuntu:20.04
 
 # Apr 14, 2020
 ARG ANBOX_COMMIT=1edeb4f07941aaa65624cea59f1f77c314ad1b97
-
-# Apr 7, 2020
-# NOTE: we can't use lxc 4.0.1 dpkg because of https://github.com/lxc/lxc/issues/3363
-ARG LXC_COMMIT=7672d4083f9a75cb72c0f914e1444200dd67ce15
 
 # ARG ANDROID_IMAGE=https://build.anbox.io/android-images/2018/07/19/android_amd64.img
 # Mirror
@@ -56,10 +55,11 @@ COPY ./src/patches/anbox /patches
 RUN git config user.email "nobody@example.com" && \
   git config user.name "AinD Build Script" && \
   git am /patches/* && git show --summary
-RUN mkdir build && \
-  cd build && \
-  cmake .. && \
-  make -j10 anbox
+# runopt = --mount=type=cache,id=aind-anbox,target=/build
+RUN mkdir -p /build && cd /build && \
+  cmake ../anbox && \
+  make -j10 anbox && \
+  cp -f ./src/anbox /anbox-binary
 
 FROM ${BASE} AS android-img
 ENV DEBIAN_FRONTEND=noninteractive
@@ -69,24 +69,14 @@ RUN apt-get update && \
 ARG ANDROID_IMAGE
 RUN curl --retry 10 -L -o /android.img $ANDROID_IMAGE
 
-FROM ${BASE} AS lxc
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y autoconf automake build-essential libtool git libapparmor-dev libcap-dev libgnutls28-dev libpam0g-dev libseccomp-dev libselinux1-dev linux-libc-dev pkg-config
-RUN git clone https://github.com/lxc/lxc.git /lxc
-WORKDIR /lxc
-ARG LXC_COMMIT
-RUN git pull && git checkout ${LXC_COMMIT}
-RUN ./autogen.sh && ./configure || (cat config.log; exit 1)
-RUN make && make install
-
 FROM ${BASE}
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
   apt-get install -qq -y --no-install-recommends \
 # base system
   ca-certificates curl iproute2 jq kmod socat \
-# lxc deps
-  iptables libcap2 libseccomp2 libselinux1 \
+# lxc
+  iptables lxc \
 # anbox deps
   libboost-log1.71.0  libboost-thread1.71.0 libboost-program-options1.71.0 libboost-iostreams1.71.0 libboost-filesystem1.71.0 libegl1-mesa libgles2-mesa libprotobuf-lite17 libsdl2-2.0-0 libsdl2-image-2.0-0 \
 # squashfuse
@@ -110,9 +100,8 @@ RUN mkdir -p /apk-pre.d /apk.d && \
   curl -L -o /apk-pre.d/FDroid.apk https://f-droid.org/FDroid.apk && \
   curl -L -o /apk-pre.d/firefox.apk https://ftp.mozilla.org/pub/mobile/releases/68.7.0/android-x86_64/en-US/fennec-68.7.0.en-US.android-x86_64.apk && \
   chmod 444 /apk-pre.d/*
-COPY --from=lxc /usr/local /usr/local/
 COPY --from=android-img /android.img /aind-android.img
-COPY --from=anbox /anbox/build/src/anbox /usr/local/bin/anbox
+COPY --from=anbox /anbox-binary /usr/local/bin/anbox
 COPY --from=anbox /anbox/scripts/anbox-bridge.sh /usr/local/share/anbox/anbox-bridge.sh
 COPY --from=anbox /anbox/data/ui /usr/local/share/anbox/ui
 RUN ldconfig
