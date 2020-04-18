@@ -1,3 +1,6 @@
+# this dockerfile can be translated to `docker/dockerfile:1-experimental` syntax for enabling cache mounts:
+# $ ./hack/translate-dockerfile-runopt-directive.sh < Dockerfile | DOCKER_BUILDKIT=1 docker build -f -  .
+
 ARG BASE=ubuntu:20.04
 
 # Apr 14, 2020
@@ -56,10 +59,11 @@ COPY ./src/patches/anbox /patches
 RUN git config user.email "nobody@example.com" && \
   git config user.name "AinD Build Script" && \
   git am /patches/* && git show --summary
-RUN mkdir build && \
-  cd build && \
-  cmake .. && \
-  make -j10 anbox
+# runopt = --mount=type=cache,id=aind-anbox,target=/build
+RUN mkdir -p /build && cd /build && \
+  cmake ../anbox && \
+  make -j10 anbox && \
+  cp -f ./src/anbox /anbox-binary
 
 FROM ${BASE} AS android-img
 ENV DEBIAN_FRONTEND=noninteractive
@@ -112,7 +116,7 @@ RUN mkdir -p /apk-pre.d /apk.d && \
   chmod 444 /apk-pre.d/*
 COPY --from=lxc /usr/local /usr/local/
 COPY --from=android-img /android.img /aind-android.img
-COPY --from=anbox /anbox/build/src/anbox /usr/local/bin/anbox
+COPY --from=anbox /anbox-binary /usr/local/bin/anbox
 COPY --from=anbox /anbox/scripts/anbox-bridge.sh /usr/local/share/anbox/anbox-bridge.sh
 COPY --from=anbox /anbox/data/ui /usr/local/share/anbox/ui
 RUN ldconfig
