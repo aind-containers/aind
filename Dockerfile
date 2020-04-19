@@ -56,7 +56,7 @@ COPY ./src/patches/anbox /patches
 # `git am` requires user info to be set
 RUN git config user.email "nobody@example.com" && \
   git config user.name "AinD Build Script" && \
-  git am /patches/* && git show --summary
+  git am /patches/*.patch && git show --summary
 # runopt = --mount=type=cache,id=aind-anbox,target=/build
 RUN mkdir -p /build && cd /build && \
   cmake ../anbox && \
