@@ -9,6 +9,8 @@ ARG ANBOX_COMMIT=1edeb4f07941aaa65624cea59f1f77c314ad1b97
 # ARG ANDROID_IMAGE=https://build.anbox.io/android-images/2018/07/19/android_amd64.img
 # Mirror
 ARG ANDROID_IMAGE=https://github.com/AkihiroSuda/anbox-android-images-mirror/releases/download/snapshot-20180719/android_amd64.img
+# https://build.anbox.io/android-images/2018/07/19/android_amd64.img.sha256sum
+ARG ANDROID_IMAGE_SHA256=6b04cd33d157814deaf92dccf8a23da4dc00b05ca6ce982a03830381896a8cca
 
 FROM ${BASE} AS anbox
 ENV DEBIAN_FRONTEND=noninteractive
@@ -67,7 +69,9 @@ RUN apt-get update && \
   apt-get install -qq -y --no-install-recommends \
   ca-certificates curl
 ARG ANDROID_IMAGE
-RUN curl --retry 10 -L -o /android.img $ANDROID_IMAGE
+ARG ANDROID_IMAGE_SHA256
+RUN curl --retry 10 -L -o /android.img $ANDROID_IMAGE \
+    && echo $ANDROID_IMAGE_SHA256 /android.img | sha256sum --check
 
 FROM ${BASE}
 ENV DEBIAN_FRONTEND=noninteractive
