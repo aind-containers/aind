@@ -62,7 +62,7 @@ docker exec aind cat /home/user/.vnc/passwdfile
 > **NOTE**: `--privileged` is required for nesting an Anbox (LXC) inside Docker. But you don't need to worry too much because Anbox launches "unprivileged" LXC using user namespaces. You can confirm that all Android processes are running as non-root users, by executing `docker exec aind ps -ef`.
 
 Wait for 10-20 seconds until Android processes are shown up in `docker exec aind ps -ef`, and then connect to `5900` via `vncviewer`.
-The VNC password is stored in `/home/user/.vnc/passwdfile`. The password file can be also overridden by `docker run -v /your/own/passwdfile:/home/user/.vnc/passwdfile:ro"
+The VNC password is stored in `/home/user/.vnc/passwdfile`. The password file can be also overridden by `docker run -v /your/own/passwdfile:/home/user/.vnc/passwdfile:ro` .
 
 If the application manager doesn't shown up on the VNC screen, try `docker run ...` several times (FIXME).  Also make sure to check `docker logs aind`.
 
@@ -132,7 +132,7 @@ To use F-Droid, enable "Settings" -> "Security" -> "Allow installation of apps f
 ### Isn't encrypting the phone with strong passcode enough for anti-theft? Why do we need aind?
 People in th real world are likely to set weak passcode like "1234" (or finger pattern), because they want to open email/phone/twitter/maps/payment apps in just a few seconds.
 
-aind is expected to be used in conjunction with encryption, and to be used only for sensitive apps, with more strong passcode.
+aind is expected to be used in conjunction with encryption of the client device, and to be used only for sensitive apps, with a passcode that is stronger than the passcode of the client device itself.
 
 ## TODOs
 * Map different UID range per containers
@@ -141,6 +141,21 @@ aind is expected to be used in conjunction with encryption, and to be used only 
 * Redirect camera, notifications, ...
 
 ## Similar projects
-* https://github.com/budtmo/docker-android (VM-based)
-* https://github.com/kubedroid/kubedroid (VM-based)
-* https://anbox-cloud.io/ (Proprietary and different goals)
+* [Anbox](https://anbox.io/): Desktop only and single-user/single-instance only. aind is built using Anbox.
+* [Android container in Chrome OS](https://chromium.googlesource.com/chromiumos/platform2/+/master/arc/container-bundle/): ChromeOS/ChromiumOS-only
+* [Docker-Android](https://github.com/budtmo/docker-android): VM-based
+* [kubedroid](https://github.com/kubedroid/kubedroid): VM-based
+* [Anbox Cloud](https://anbox-cloud.io/): Proprietary
+* [Intel Celadon in Container (CIC)](https://github.com/projectceladon/device-intel-cic): [Proprietary](https://github.com/projectceladon/vendor-intel-cic/blob/9b91758a3fa0a6530910d0ada8e99816aa17195d/README)
+
+## License
+* aind itself (e.g. Dockerfile, Kubernetes manifests, and start-up scripts) is licensed under the terms of [the Apache License, Version 2.0](./LICENSE).
+* The Anbox patches ([`./src/patches/anbox/*.patch`](./src/patches/anbox)) are licensed under the terms of [the GNU General Public License, Version 3](https://github.com/anbox/anbox/blob/master/COPYING.GPL), corresponding to [Anbox](https://github.com/anbox/anbox) itself.
+
+### Binary image
+* [The `aind/aind` image on Docker Hub](https://hub.docker.com/r/aind/aind) (built from [`./Dockerfile`](./Dockerfile)) contains the binaries of several free software.
+  * Anbox (`/usr/local/bin/anbox`): [the GNU General Public License, Version 3](https://github.com/anbox/anbox/blob/master/COPYING.GPL)
+  * Firefox (`/apk-pre.d/fennec-*.apk`): [the Mozilla Public License 2](https://www.mozilla.org/en-US/about/legal/eula/)
+  * F-Droid (`/apk-pre.d/FDroid.apk`): [the GNU General Public License, Version 3](https://gitlab.com/fdroid/fdroidclient/-/blob/master/LICENSE)
+  * Android image (`/android.img`, fetched from https://build.anbox.io/): see https://source.android.com/setup/start/licenses . For build instruction, see https://github.com/anbox/anbox/blob/master/docs/build-android.md
+  * For other packages, see `/usr/share/doc/*/copyright` .
