@@ -130,7 +130,7 @@ To use F-Droid, enable "Settings" -> "Security" -> "Allow installation of apps f
 
 ## FAQ
 ### Isn't encrypting the phone with strong passcode enough for anti-theft? Why do we need aind?
-People in th real world are likely to set weak passcode like "1234" (or finger pattern), because they want to open email/phone/twitter/maps/payment apps in just a few seconds.
+People in the real world are likely to set weak passcode like "1234" (or finger pattern), because they want to open email/phone/twitter/maps/payment apps in just a few seconds.
 
 aind is expected to be used in conjunction with encryption of the client device, and to be used only for sensitive apps, with a passcode that is stronger than the passcode of the client device itself.
 
