@@ -3,8 +3,8 @@
 
 ARG BASE=ubuntu:20.04
 
-# Apr 14, 2020
-ARG ANBOX_COMMIT=1edeb4f07941aaa65624cea59f1f77c314ad1b97
+# May 19, 2020
+ARG ANBOX_COMMIT=35fe93b8407d2fec9d925e35a5294c567569d9ed
 
 # ARG ANDROID_IMAGE=https://build.anbox.io/android-images/2018/07/19/android_amd64.img
 # Mirror
@@ -56,7 +56,7 @@ COPY ./src/patches/anbox /patches
 # `git am` requires user info to be set
 RUN git config user.email "nobody@example.com" && \
   git config user.name "AinD Build Script" && \
-  git am /patches/*.patch && git show --summary
+  if [ -f /patches/*.patch ]; then git am /patches/*.patch && git show --summary; fi
 # runopt = --mount=type=cache,id=aind-anbox,target=/build
 RUN mkdir -p /build && cd /build && \
   cmake ../anbox && \
