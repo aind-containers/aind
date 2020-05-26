@@ -6,7 +6,7 @@ Wants=network.target
 [Service]
 ExecStartPre=/usr/local/bin/anbox-container-manager-pre.sh
 ExecStartPre=/usr/local/share/anbox/anbox-bridge.sh start
-ExecStart=/usr/local/bin/anbox container-manager --daemon --data-path=/var/lib/anbox --android-image=/aind-android.img --use-rootfs-overlay --use-squashfuse
+ExecStart=/usr/local/bin/anbox container-manager --daemon --data-path=/var/lib/anbox --android-image=/aind-android.img --use-rootfs-overlay --force-squashfuse
 ExecStopPost=/usr/local/share/anbox/anbox-bridge.sh stop
 
 [Install]
