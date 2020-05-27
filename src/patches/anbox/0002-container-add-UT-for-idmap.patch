@@ -1,0 +1,149 @@
+From 189e9fe5766ffe7126ecd547fdc55e0567fe1c7f Mon Sep 17 00:00:00 2001
+From: Akihiro Suda <akihiro.suda.cz@hco.ntt.co.jp>
+Date: Wed, 27 May 2020 15:10:08 +0900
+Subject: [PATCH 2/2] container: add UT for idmap
+
+Signed-off-by: Akihiro Suda <akihiro.suda.cz@hco.ntt.co.jp>
+---
+ src/anbox/container/lxc_container.cpp         | 22 ++++++---
+ src/anbox/container/lxc_container.h           |  3 ++
+ tests/anbox/CMakeLists.txt                    |  1 +
+ tests/anbox/container/CMakeLists.txt          |  1 +
+ tests/anbox/container/lxc_container_tests.cpp | 49 +++++++++++++++++++
+ 5 files changed, 69 insertions(+), 7 deletions(-)
+ create mode 100644 tests/anbox/container/CMakeLists.txt
+ create mode 100644 tests/anbox/container/lxc_container_tests.cpp
+
+diff --git a/src/anbox/container/lxc_container.cpp b/src/anbox/container/lxc_container.cpp
+index 28d4d9b..f7c6346 100644
+--- a/src/anbox/container/lxc_container.cpp
++++ b/src/anbox/container/lxc_container.cpp
+@@ -118,25 +118,33 @@ LxcContainer::~LxcContainer() {
+     lxc_container_put(container_);
+ }
+ 
+-void LxcContainer::setup_id_map() {
++std::vector<std::string> get_id_map(uid_t uid, gid_t gid) {
+   const auto base_id = unprivileged_uid;
+   const auto max_id = 100000;
++  std::vector<std::string> config;
+ 
+-  set_config_item(lxc_config_idmap_key, utils::string_format("u 0 %d %d", base_id, android_system_uid - 1));
+-  set_config_item(lxc_config_idmap_key, utils::string_format("g 0 %d %d", base_id, android_system_uid - 1));
++  config.push_back(utils::string_format("u 0 %d %d", base_id, android_system_uid - 1));
++  config.push_back(utils::string_format("g 0 %d %d", base_id, android_system_uid - 1));
+ 
+   // We need to bind the user id for the one running the client side
+   // process as he is the owner of various socket files we bind mount
+   // into the container.
+-  set_config_item(lxc_config_idmap_key, utils::string_format("u %d %d 1", android_system_uid, creds_.uid()));
+-  set_config_item(lxc_config_idmap_key, utils::string_format("g %d %d 1", android_system_uid, creds_.gid()));
++  config.push_back(utils::string_format("u %d %d 1", android_system_uid, uid));
++  config.push_back(utils::string_format("g %d %d 1", android_system_uid, gid));
+ 
+-  set_config_item(lxc_config_idmap_key, utils::string_format("u %d %d %d", android_system_uid + 1,
++  config.push_back(utils::string_format("u %d %d %d", android_system_uid + 1,
+                                                      base_id + android_system_uid + 1,
+                                                      max_id - android_system_uid));
+-  set_config_item(lxc_config_idmap_key, utils::string_format("g %d %d %d", android_system_uid + 1,
++  config.push_back(utils::string_format("g %d %d %d", android_system_uid + 1,
+                                                      base_id + android_system_uid + 1,
+                                                      max_id - android_system_uid));
++  return config;
++}
++
++void LxcContainer::setup_id_map() {
++  auto config = get_id_map(creds_.uid(), creds_.gid());
++  for (std::string val : config)
++    set_config_item(lxc_config_idmap_key, val);
+ }
+ 
+ void LxcContainer::setup_network() {
+diff --git a/src/anbox/container/lxc_container.h b/src/anbox/container/lxc_container.h
+index 48173db..b7b8031 100644
+--- a/src/anbox/container/lxc_container.h
++++ b/src/anbox/container/lxc_container.h
+@@ -62,6 +62,9 @@ class LxcContainer : public Container {
+   network::Credentials creds_;
+   std::vector<std::unique_ptr<common::BinderDevice>> binder_devices_;
+ };
++
++// get_id_map() is published for unit testing
++std::vector<std::string> get_id_map(uid_t uid, gid_t gid);
+ }  // namespace container
+ }  // namespace anbox
+ 
+diff --git a/tests/anbox/CMakeLists.txt b/tests/anbox/CMakeLists.txt
+index c0211bd..dfec894 100644
+--- a/tests/anbox/CMakeLists.txt
++++ b/tests/anbox/CMakeLists.txt
+@@ -3,3 +3,4 @@ add_subdirectory(application)
+ add_subdirectory(support)
+ add_subdirectory(common)
+ add_subdirectory(graphics)
++add_subdirectory(container)
+diff --git a/tests/anbox/container/CMakeLists.txt b/tests/anbox/container/CMakeLists.txt
+new file mode 100644
+index 0000000..c46d9a9
+--- /dev/null
++++ b/tests/anbox/container/CMakeLists.txt
+@@ -0,0 +1 @@
++ANBOX_ADD_TEST(lxc_container_tests lxc_container_tests.cpp)
+diff --git a/tests/anbox/container/lxc_container_tests.cpp b/tests/anbox/container/lxc_container_tests.cpp
+new file mode 100644
+index 0000000..df17928
+--- /dev/null
++++ b/tests/anbox/container/lxc_container_tests.cpp
+@@ -0,0 +1,49 @@
++/*
++ * Copyright (C) 2020 NTT Corporation
++ *
++ * This program is free software: you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License version 3, as published
++ * by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranties of
++ * MERCHANTABILITY, SATISFACTORY QUALITY, or FITNESS FOR A PARTICULAR
++ * PURPOSE.  See the GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program.  If not, see <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <memory>
++#include <sys/types.h>
++#include "anbox/container/lxc_container.h"
++
++#include <gtest/gtest.h>
++
++namespace anbox {
++namespace container {
++TEST(LxcContainer, IDMap) {
++ auto config = get_id_map(static_cast<uid_t>(1000), static_cast<gid_t>(1000));
++ EXPECT_EQ(6, config.size());
++ EXPECT_STREQ("u 0 100000 999", config[0].c_str());
++ EXPECT_STREQ("g 0 100000 999", config[1].c_str());
++ EXPECT_STREQ("u 1000 1000 1", config[2].c_str());
++ EXPECT_STREQ("g 1000 1000 1", config[3].c_str());
++ // NOTE: host UID 100999 and 101000 are unmapped due to a historical reason
++ // https://github.com/anbox/anbox/issues/1428#issuecomment-615377907
++ EXPECT_STREQ("u 1001 101001 99000", config[4].c_str());
++ EXPECT_STREQ("g 1001 101001 99000", config[5].c_str());
++
++ config = get_id_map(static_cast<uid_t>(2000), static_cast<gid_t>(2000));
++ EXPECT_EQ(6, config.size());
++ EXPECT_STREQ("u 0 100000 999", config[0].c_str());
++ EXPECT_STREQ("g 0 100000 999", config[1].c_str());
++ EXPECT_STREQ("u 1000 2000 1", config[2].c_str());
++ EXPECT_STREQ("g 1000 2000 1", config[3].c_str());
++ EXPECT_STREQ("u 1001 101001 99000", config[4].c_str());
++ EXPECT_STREQ("g 1001 101001 99000", config[5].c_str());
++}
++
++} // namespace container
++} // namespace anbox
+-- 
+2.25.1
+
