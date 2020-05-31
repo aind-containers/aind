@@ -1,0 +1,33 @@
+From e673cf3df6397480a33a85c020e486b4bf306855 Mon Sep 17 00:00:00 2001
+From: Akihiro Suda <akihiro.suda.cz@hco.ntt.co.jp>
+Date: Wed, 27 May 2020 14:32:49 +0900
+Subject: [PATCH 1/2] container: Fix "the number of mapped UIDs varies
+ depending on creds._uid value"
+
+Fix #1428
+
+Signed-off-by: Akihiro Suda <akihiro.suda.cz@hco.ntt.co.jp>
+---
+ src/anbox/container/lxc_container.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/anbox/container/lxc_container.cpp b/src/anbox/container/lxc_container.cpp
+index 1bc4aa6..28d4d9b 100644
+--- a/src/anbox/container/lxc_container.cpp
++++ b/src/anbox/container/lxc_container.cpp
+@@ -133,10 +133,10 @@ void LxcContainer::setup_id_map() {
+ 
+   set_config_item(lxc_config_idmap_key, utils::string_format("u %d %d %d", android_system_uid + 1,
+                                                      base_id + android_system_uid + 1,
+-                                                     max_id - creds_.uid() - 1));
++                                                     max_id - android_system_uid));
+   set_config_item(lxc_config_idmap_key, utils::string_format("g %d %d %d", android_system_uid + 1,
+                                                      base_id + android_system_uid + 1,
+-                                                     max_id - creds_.gid() - 1));
++                                                     max_id - android_system_uid));
+ }
+ 
+ void LxcContainer::setup_network() {
+-- 
+2.25.1
+
