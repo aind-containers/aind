@@ -3,8 +3,8 @@
 
 ARG BASE=ubuntu:20.04
 
-# May 19, 2020
-ARG ANBOX_COMMIT=35fe93b8407d2fec9d925e35a5294c567569d9ed
+# Jun 9, 2020
+ARG ANBOX_COMMIT=c898810050df67adccd64a84b2d763250a42e722
 
 # ARG ANDROID_IMAGE=https://build.anbox.io/android-images/2018/07/19/android_amd64.img
 # Mirror
@@ -102,7 +102,7 @@ RUN apt-get update && \
 # apk-pre.d is for pre-installed apks, /apk.d for the mountpoint for user-specific apks
 RUN mkdir -p /apk-pre.d /apk.d && \
   curl -L -o /apk-pre.d/FDroid.apk https://f-droid.org/FDroid.apk && \
-  curl -L -o /apk-pre.d/firefox.apk https://ftp.mozilla.org/pub/mobile/releases/68.7.0/android-x86_64/en-US/fennec-68.7.0.en-US.android-x86_64.apk && \
+  curl -L -o /apk-pre.d/firefox.apk https://ftp.mozilla.org/pub/mobile/releases/68.9.0/android-x86_64/en-US/fennec-68.9.0.en-US.android-x86_64.apk && \
   chmod 444 /apk-pre.d/*
 COPY --from=android-img /android.img /aind-android.img
 COPY --from=anbox /anbox-binary /usr/local/bin/anbox
