@@ -3,8 +3,8 @@
 
 ARG BASE=ubuntu:20.04
 
-# Jun 9, 2020
-ARG ANBOX_COMMIT=c898810050df67adccd64a84b2d763250a42e722
+# Aug 21, 2020
+ARG ANBOX_COMMIT=c1e75506bad0c479c8591970ce422aa8646654ac
 
 # ARG ANDROID_IMAGE=https://build.anbox.io/android-images/2018/07/19/android_amd64.img
 # Mirror
