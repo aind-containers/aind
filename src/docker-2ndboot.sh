@@ -24,9 +24,8 @@ export DISPLAY=:0
 until [ -e /tmp/.X11-unix/X0 ]; do sleep 1; done
 : FIXME: remove this sleep
 sleep 1
-x11vnc -usepw &
-: FIXME: remove this sleep
-sleep 1
+x11vnc -usepw -ncache 10 -forever -bg
+
 fvwm &
 if ! systemctl is-system-running --wait; then
     systemctl status --no-pager -l anbox-container-manager
