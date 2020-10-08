@@ -3,8 +3,8 @@
 
 ARG BASE=ubuntu:20.04
 
-# Jun 9, 2020
-ARG ANBOX_COMMIT=c898810050df67adccd64a84b2d763250a42e722
+# Sep 26, 2020
+ARG ANBOX_COMMIT=170f1e029e753e782c66bffb05e91dd770d47dc3
 
 # ARG ANDROID_IMAGE=https://build.anbox.io/android-images/2018/07/19/android_amd64.img
 # Mirror
@@ -35,6 +35,7 @@ RUN apt-get update && \
   libboost-thread-dev \
   libcap-dev \
   libegl1-mesa-dev \
+  libexpat1-dev \
   libgles2-mesa-dev \
   libglm-dev \
   libgtest-dev \
@@ -48,20 +49,18 @@ RUN apt-get update && \
   pkg-config \
   protobuf-compiler \
   python2
-RUN git clone https://github.com/anbox/anbox /anbox
+RUN git clone --recursive https://github.com/anbox/anbox /anbox
 WORKDIR /anbox
 ARG ANBOX_COMMIT
-RUN git pull && git checkout ${ANBOX_COMMIT}
+RUN git pull && git checkout ${ANBOX_COMMIT} && git submodule update --recursive
 COPY ./src/patches/anbox /patches
 # `git am` requires user info to be set
 RUN git config user.email "nobody@example.com" && \
   git config user.name "AinD Build Script" && \
   if [ -f /patches/*.patch ]; then git am /patches/*.patch && git show --summary; fi
 # runopt = --mount=type=cache,id=aind-anbox,target=/build
-RUN mkdir -p /build && cd /build && \
-  cmake ../anbox && \
-  make -j10 anbox && \
-  cp -f ./src/anbox /anbox-binary
+RUN ./scripts/build.sh && \
+  cp -f ./build/src/anbox /anbox-binary
 
 FROM ${BASE} AS android-img
 ENV DEBIAN_FRONTEND=noninteractive

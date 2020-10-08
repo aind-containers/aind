@@ -8,7 +8,7 @@ fi
 # ashmem
 /sbin/modprobe ashmem_linux
 if [ ! -e /dev/ashmem ]; then
-	mknod /dev/ashmem c 10 52
+	mknod /dev/ashmem c 10 55
 fi
 
 # binder (newer kernel uses /dev/binderfs directory; older kernel uses /dev/binder file)
@@ -20,6 +20,6 @@ if grep binder /proc/filesystems; then
 	fi
 else
 	if [ ! -e /dev/binder ]; then
-		mknod /dev/binder c 10 59
+		mknod /dev/binder c 511 0
 	fi
 fi
