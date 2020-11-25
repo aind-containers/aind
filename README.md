@@ -66,6 +66,11 @@ docker run -td --name aind --privileged -p 5900:5900 -v /lib/modules:/lib/module
 docker exec aind cat /home/user/.vnc/passwdfile
 ```
 
+```bash
+docker run -td --name aind --privileged -p 8080:8080 -e "NOVNC=1" -v /lib/modules:/lib/modules:ro aind/aind
+docker exec aind cat /home/user/.vnc/passwdfile
+```
+
 > **NOTE**: `--privileged` is required for nesting an Anbox (LXC) inside Docker. But you don't need to worry too much because Anbox launches "unprivileged" LXC using user namespaces. You can confirm that all Android processes are running as non-root users, by executing `docker exec aind ps -ef`.
 
 Wait for 10-20 seconds until Android processes are shown up in `docker exec aind ps -ef`, and then connect to `5900` via `vncviewer`.
@@ -158,7 +163,7 @@ aind is expected to be used in conjunction with encryption of the client device,
 
 ## TODOs
 * Map different UID range per containers
-* Support remote connection from phones and tablets, ideally using Web browsers (noVNC?).
+* Support remote connection from phones and tablets, ideally using Web browsers (noVNC support).
 * Better touch screen experience
 * Redirect camera, notifications, ...
 
@@ -177,7 +182,9 @@ aind is expected to be used in conjunction with encryption of the client device,
 ### Binary image
 * [The `aind/aind` image on Docker Hub](https://hub.docker.com/r/aind/aind) (built from [`./Dockerfile`](./Dockerfile)) contains the binaries of several free software.
   * Anbox (`/usr/local/bin/anbox`): [the GNU General Public License, Version 3](https://github.com/anbox/anbox/blob/master/COPYING.GPL)
+  * SAI (`/apk-pre.d/SAI.apk`): [the GNU General Public License, Version 3](https://github.com/Aefyr/SAI/blob/master/LICENSE)
   * Firefox (`/apk-pre.d/fennec-*.apk`): [the Mozilla Public License 2](https://www.mozilla.org/en-US/about/legal/eula/)
+  * Aurora Store (`/apk-pre.d/aurora_store.apk`): [the GNU General Public License, Version 3](https://gitlab.com/AuroraOSS/AuroraStore/-/blob/master/LICENSE)
   * F-Droid (`/apk-pre.d/FDroid.apk`): [the GNU General Public License, Version 3](https://gitlab.com/fdroid/fdroidclient/-/blob/master/LICENSE)
   * Android image (`/android.img`, fetched from https://build.anbox.io/): see https://source.android.com/setup/start/licenses . For build instruction, see https://github.com/anbox/anbox/blob/master/docs/build-android.md
   * For other packages, see `/usr/share/doc/*/copyright` .

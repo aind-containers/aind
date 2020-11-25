@@ -79,6 +79,12 @@ fi
 
 [ -n "${POST_SESSION_SCRIPT:-}" ] && . $POST_SESSION_SCRIPT
 
+if [ $(cat /novnc_enabled) = "1" ]; then
+    echo "running websockify..."
+    websockify -D --web /usr/share/novnc/ 0.0.0.0:8080 127.0.0.1:5900
+    echo "websockify -> $?"
+fi
+
 # done
 figlet "Ready"
 echo "Hint: the password is stored in $HOME/.vnc/passwdfile"
