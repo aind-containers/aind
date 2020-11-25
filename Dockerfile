@@ -77,7 +77,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
   apt-get install -qq -y --no-install-recommends \
 # base system
-  ca-certificates curl iproute2 jq kmod socat \
+  ca-certificates curl iproute2 jq kmod socat wget \
 # lxc
   iptables lxc \
 # anbox deps
@@ -90,6 +90,8 @@ RUN apt-get update && \
   dbus dbus-user-session systemd systemd-container systemd-sysv \
 # X11
   xvfb x11vnc \
+# noVNC
+  websockify novnc \
 # WM
   fvwm xterm \
 # debug utilities
@@ -102,6 +104,8 @@ RUN apt-get update && \
 RUN mkdir -p /apk-pre.d /apk.d && \
   curl -L -o /apk-pre.d/FDroid.apk https://f-droid.org/FDroid.apk && \
   curl -L -o /apk-pre.d/firefox.apk https://ftp.mozilla.org/pub/mobile/releases/68.9.0/android-x86_64/en-US/fennec-68.9.0.en-US.android-x86_64.apk && \
+  curl -L -o /apk-pre.d/aurora_store.apk https://auroraoss.com/AuroraStore/Stable/AuroraStore_3.2.9.apk && \
+  curl -L -o /apk-pre.d/SAI.apk https://github.com/Aefyr/SAI/releases/download/4.2/SAI-4.2.apk && \
   chmod 444 /apk-pre.d/*
 COPY --from=android-img /android.img /aind-android.img
 COPY --from=anbox /anbox-binary /usr/local/bin/anbox
@@ -113,11 +117,19 @@ ADD src/anbox-container-manager.service /lib/systemd/system/anbox-container-mana
 RUN systemctl enable anbox-container-manager
 ADD src/unsudo /usr/local/bin
 ADD src/docker-2ndboot.sh  /home/user
+
+ARG NOVNC=0
+RUN sed '/exec \$systemd/i echo \$NOVNC > /novnc_enabled' /docker-entrypoint.sh > /docker-entrypoint2.sh && \
+  rm /docker-entrypoint.sh && \
+  mv /docker-entrypoint2.sh /docker-entrypoint.sh && \
+  chmod +x /docker-entrypoint.sh
+
 # Usage: docker run --rm --privileged -v /:/host --entrypoint bash aind/aind -exc "cp -f /install-kmod.sh /host/aind-install-kmod.sh && cd /host && chroot . /aind-install-kmod.sh"
 ADD hack/install-kmod.sh /
 VOLUME /var/lib/anbox
 ENTRYPOINT ["/docker-entrypoint.sh", "unsudo"]
 EXPOSE 5900
+EXPOSE 8080
 HEALTHCHECK --interval=15s --timeout=10s --start-period=60s --retries=5 \
   CMD ["pgrep", "-f", "org.anbox.appmgr"]
 CMD ["/home/user/docker-2ndboot.sh"]
