@@ -124,6 +124,8 @@ adb shell
 ### Pre-installed Apps
 * Firefox
 * F-Droid
+* SAI
+* Aurora Store
 * Misc accessories like Clock and Calculator
 
 ### Installing apk packages
