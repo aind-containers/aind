@@ -4,7 +4,7 @@
 ARG BASE=ubuntu:20.04
 
 # Sep 26, 2020
-ARG ANBOX_COMMIT=170f1e029e753e782c66bffb05e91dd770d47dc3
+ARG ANBOX_COMMIT=c898810050df67adccd64a84b2d763250a42e722
 
 # ARG ANDROID_IMAGE=https://build.anbox.io/android-images/2018/07/19/android_amd64.img
 # Mirror
@@ -48,19 +48,40 @@ RUN apt-get update && \
   lxc-dev \
   pkg-config \
   protobuf-compiler \
-  python2
+  python2 \
+  cmake-extras \
+  google-mock \
+  libgmock-dev python2
 RUN git clone --recursive https://github.com/anbox/anbox /anbox
 WORKDIR /anbox
 ARG ANBOX_COMMIT
-RUN git pull && git checkout ${ANBOX_COMMIT} && git submodule update --recursive
+RUN git pull && git checkout -f ${ANBOX_COMMIT} && git submodule update --recursive
 COPY ./src/patches/anbox /patches
 # `git am` requires user info to be set
 RUN git config user.email "nobody@example.com" && \
   git config user.name "AinD Build Script" && \
   if [ -f /patches/*.patch ]; then git am /patches/*.patch && git show --summary; fi
 # runopt = --mount=type=cache,id=aind-anbox,target=/build
-RUN ./scripts/build.sh && \
-  cp -f ./build/src/anbox /anbox-binary
+RUN mkdir -p /anbox/build && \
+    cd /anbox/build && \
+    cmake .. && \
+    make -j4
+RUN cp -f /anbox/build/src/anbox /anbox-binary
+
+FROM ${BASE} AS swiftshader
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && \
+  apt-get install -qq -y \
+  ca-certificates bash tar \
+  git build-essential cmake python3 libx11-dev libxext-dev
+
+RUN git clone https://swiftshader.googlesource.com/SwiftShader /swiftshader && \
+    cd /swiftshader && \
+    git checkout -f b6e8c3f0f4830887d69ba765a922ac3c40e81dd9
+RUN mkdir -p /swiftshader/build && \
+    cd /swiftshader/build && \
+    cmake .. && \
+    make -j4
 
 FROM ${BASE} AS android-img
 ENV DEBIAN_FRONTEND=noninteractive
@@ -89,6 +110,7 @@ RUN apt-get update && \
 # systemd
   dbus dbus-user-session systemd systemd-container systemd-sysv \
 # X11
+  libx11-6 libx11-data libxext6 \
   xvfb x11vnc \
 # WM
   fvwm xterm \
@@ -103,7 +125,9 @@ RUN mkdir -p /apk-pre.d /apk.d && \
   curl -L -o /apk-pre.d/FDroid.apk https://f-droid.org/FDroid.apk && \
   curl -L -o /apk-pre.d/firefox.apk https://ftp.mozilla.org/pub/mobile/releases/68.9.0/android-x86_64/en-US/fennec-68.9.0.en-US.android-x86_64.apk && \
   chmod 444 /apk-pre.d/*
+RUN mkdir -p /lib/anbox/swiftshader
 COPY --from=android-img /android.img /aind-android.img
+COPY --from=swiftshader /swiftshader/build/libEGL.so /swiftshader/build/libGLES_CM.so /swiftshader/build/libGLESv2.so /lib/anbox/swiftshader/
 COPY --from=anbox /anbox-binary /usr/local/bin/anbox
 COPY --from=anbox /anbox/scripts/anbox-bridge.sh /usr/local/share/anbox/anbox-bridge.sh
 COPY --from=anbox /anbox/data/ui /usr/local/share/anbox/ui
