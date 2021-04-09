@@ -42,11 +42,11 @@ anbox launch --package=org.anbox.appmgr --component=org.anbox.appmgr.AppViewActi
 adb wait-for-device
 
 # install apk (pre-installed apps such as F-Droid)
-for f in /apk-pre.d/*.apk; do adb install $f; done
+for f in /apk-pre.d/*.apk; do adb install -r $f; done
 
 # install apk
 if ls /apk.d/*.apk; then
-    for f in /apk.d/*.apk; do adb install $f; done
+    for f in /apk.d/*.apk; do adb install -r $f; done
 fi
 
 # done
