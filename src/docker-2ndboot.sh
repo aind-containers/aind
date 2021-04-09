@@ -20,6 +20,7 @@ fi
 
 Xvfb &
 export DISPLAY=:0
+export EGL_PLATFORM=x11
 
 until [ -e /tmp/.X11-unix/X0 ]; do sleep 1; done
 : FIXME: remove this sleep
