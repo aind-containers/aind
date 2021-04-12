@@ -44,6 +44,11 @@ if ! systemctl is-system-running --wait; then
 fi
 systemctl status --no-pager -l anbox-container-manager
 
+until [ -e /run/anbox-container.socket ]; do
+    echo "Waiting for ready /run/anbox-container.socket"
+    sleep 1
+done
+
 anbox session-manager ${SESSION_MANAGER_ARGS:-} &
 until anbox wait-ready; do sleep 1; done
 anbox launch --package=org.anbox.appmgr --component=org.anbox.appmgr.AppViewActivity
