@@ -13,6 +13,18 @@ function finish {
 }
 trap finish EXIT
 
+function waitUntil() {
+    local message=$1
+    local count=$2
+    until $3; do
+        echo "$message"
+        count=$((count - 1))
+        [ $count -lt 1 ] && return 1
+        sleep 1
+    done
+    return 0
+}
+
 cd $(realpath $(dirname $0)/..)
 set -eux
 
@@ -29,8 +41,9 @@ if [ $INHERIT_DISPLAY -eq 0 ]; then
     Xvfb &
     export DISPLAY=:0
     
-    until [ -e /tmp/.X11-unix/X0 ]; do sleep 1; done
-    : FIXME: remove this sleep
+    if ! waitUntil "Waiting for ready X11 server" 10 "[ -e /tmp/.X11-unix/X0 ]"; then
+      exit 1
+    fi
     sleep 1
     x11vnc -usepw -ncache 10 -forever -bg
 
@@ -44,13 +57,14 @@ if ! systemctl is-system-running --wait; then
 fi
 systemctl status --no-pager -l anbox-container-manager
 
-until [ -e /run/anbox-container.socket ]; do
-    echo "Waiting for ready /run/anbox-container.socket"
-    sleep 1
-done
+if ! waitUntil "Waiting for ready /run/anbox-container.socket" 10 "[ -e /run/anbox-container.socket ]"; then
+    exit 1
+fi
 
 anbox session-manager ${SESSION_MANAGER_ARGS:-} &
-until anbox wait-ready; do sleep 1; done
+if ! waitUntil "Waiting for ready anbox" 60 "anbox wait-ready"; then
+  exit 1
+fi
 anbox launch --package=org.anbox.appmgr --component=org.anbox.appmgr.AppViewActivity
 
 adb wait-for-device
