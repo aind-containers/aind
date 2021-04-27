@@ -1,3 +1,10 @@
+# :warning: Deprecated in favor of ReDroid
+
+As of April 2021, AinD is deprecated in favor of [ReDroid](https://github.com/remote-android/redroid-doc).
+
+While Anbox/AinD has got stuck in Android 7.1, ReDroid supports very recent Android versions: 8.1, 9, 10, 11, and Android S (12).
+
+- - -
 # AinD: Android (Anbox) in Docker
 
 AinD launches Android apps in Docker, by nesting [Anbox](https://anbox.io/) containers inside Docker.
