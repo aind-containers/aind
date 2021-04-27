@@ -1,0 +1,10 @@
+version: '3'
+services:
+    aind:
+      image: 'aind/aind'
+      privileged: true
+      tty: true
+      ports:
+        - '5900:5900'
+      volumes:
+        - '/lib/modules:/lib/modules:ro'
