@@ -98,7 +98,7 @@ The manifest is known to work on:
   - Kubernetes 1.17.0, Ubuntu 19.10, Kernel 5.3.0-46-generic, containerd 1.3.2
   - **NOTE**: Requires `docker exec kind-control-plane mount -o remount,rw /sys`
 
-## Docker Compose
+### Docker Compose
 
 To bring the container up simply run
 ```
