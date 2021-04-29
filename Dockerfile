@@ -77,7 +77,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
   apt-get install -qq -y --no-install-recommends \
 # base system
-  ca-certificates curl iproute2 jq kmod socat wget \
+  ca-certificates curl iproute2 jq kmod socat \
 # lxc
   iptables lxc \
 # anbox deps
@@ -104,8 +104,6 @@ RUN apt-get update && \
 RUN mkdir -p /apk-pre.d /apk.d && \
   curl -L -o /apk-pre.d/FDroid.apk https://f-droid.org/FDroid.apk && \
   curl -L -o /apk-pre.d/firefox.apk https://ftp.mozilla.org/pub/mobile/releases/68.9.0/android-x86_64/en-US/fennec-68.9.0.en-US.android-x86_64.apk && \
-  curl -L -o /apk-pre.d/aurora_store.apk https://auroraoss.com/AuroraStore/Stable/AuroraStore_3.2.9.apk && \
-  curl -L -o /apk-pre.d/SAI.apk https://github.com/Aefyr/SAI/releases/download/4.2/SAI-4.2.apk && \
   chmod 444 /apk-pre.d/*
 COPY --from=android-img /android.img /aind-android.img
 COPY --from=anbox /anbox-binary /usr/local/bin/anbox
