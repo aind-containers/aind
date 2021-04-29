@@ -116,8 +116,8 @@ RUN systemctl enable anbox-container-manager
 ADD src/unsudo /usr/local/bin
 ADD src/docker-2ndboot.sh  /home/user
 
-ENV NOVNC=0
-RUN echo \$NOVNC > /novnc_enabled
+ENV WEBMODE=0
+RUN echo \$WEBMODE > /novnc_enabled
 # Usage: docker run --rm --privileged -v /:/host --entrypoint bash aind/aind -exc "cp -f /install-kmod.sh /host/aind-install-kmod.sh && cd /host && chroot . /aind-install-kmod.sh"
 ADD hack/install-kmod.sh /
 VOLUME /var/lib/anbox
