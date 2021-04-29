@@ -6,12 +6,14 @@ if [ $(id -u) != 0 ]; then
 fi
 
 # ashmem
+grep -q ashmem /proc/misc ||
 /sbin/modprobe ashmem_linux
 if [ ! -e /dev/ashmem ]; then
 	mknod /dev/ashmem c 10 55
 fi
 
 # binder (newer kernel uses /dev/binderfs directory; older kernel uses /dev/binder file)
+grep -q binder /proc/devices || grep -q binder /proc/misc ||
 /sbin/modprobe binder_linux
 if grep binder /proc/filesystems; then
 	if [ ! -e /dev/binderfs/binder-control ]; then
