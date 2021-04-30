@@ -5,7 +5,7 @@ shift
 cdr=$@
 # machinectl requires absolute path
 params=("shell")
-avail_envs="INHERIT_DISPLAY DISPLAY SESSION_MANAGER_ARGS POST_SESSION_SCRIPT"
+avail_envs="INHERIT_DISPLAY DISPLAY SESSION_MANAGER_ARGS POST_SESSION_SCRIPT WEBMODE"
 for name in $avail_envs; do
 	[ -n "${!name:-}" ] && params+=("--setenv=$name=${!name}")
 done
