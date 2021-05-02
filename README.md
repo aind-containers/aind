@@ -162,7 +162,6 @@ aind is expected to be used in conjunction with encryption of the client device,
 
 ## TODOs
 * Map different UID range per containers
-* Support remote connection from phones and tablets, ideally using Web browsers (noVNC support).
 * Better touch screen experience
 * Redirect camera, notifications, ...
 
