@@ -66,7 +66,7 @@ docker run -td --name aind --privileged -p 5900:5900 -v /lib/modules:/lib/module
 ```
 
 ```bash
-docker run -td --name aind --privileged -p 8080:8080 -e "NOVNC=1" -v /lib/modules:/lib/modules:ro aind/aind
+docker run -td --name aind --privileged -p 8080:8080 -e "WEBMODE=1" -v /lib/modules:/lib/modules:ro aind/aind
 docker exec aind cat /home/user/.vnc/passwdfile
 ```
 
