@@ -5,7 +5,7 @@ services:
       privileged: true
       tty: true
       environment:
-        - WEBMODE=0
+        - WEBMODE=1
       ports:
         - '5900:5900'
         - '8080:8080'
