@@ -3,6 +3,7 @@ set -eux
 car=$1
 shift
 cdr=$@
+chown user:user /home/user/.vnc
 # machinectl requires absolute path
 params=("shell")
 avail_envs="INHERIT_DISPLAY DISPLAY SESSION_MANAGER_ARGS POST_SESSION_SCRIPT WEBMODE"
