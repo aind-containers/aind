@@ -4,7 +4,7 @@ car=$1
 shift
 cdr=$@
 
-if [ -d ~/.vnc ]; then
+if [ -d /home/user/.vnc ]; then
 	chown user:user /home/user/.vnc
 fi
 
