@@ -61,14 +61,10 @@ sudo modprobe ashmem_linux
 sudo modprobe binder_linux
 ```
 
+### Docker
+#### VNC
 ```bash
 docker run -td --name aind --privileged -p 5900:5900 -v /lib/modules:/lib/modules:ro aind/aind
-```
-
-to run the container with novnc support the environment variable WEBMODE canbe set with the following command
-the container will be accessible via the browser at http://localhost:8080/vnc.html
-```bash
-docker run -td --name aind --privileged -p 8080:8080 -e "WEBMODE=1" -v /lib/modules:/lib/modules:ro aind/aind
 docker exec aind cat /home/user/.vnc/passwdfile
 ```
 
@@ -79,14 +75,30 @@ The VNC password is stored in `/home/user/.vnc/passwdfile`. The password file ca
 
 If the application manager doesn't shown up on the VNC screen, try `docker run ...` several times (FIXME).  Also make sure to check `docker logs aind`.
 
-Future version will support connection from Web browsers (of phones and tablets) without VNC.
+#### Web mode (noVNC)
+To run the container with [noVNC](https://novnc.com/) support, the environment variable `WEBMODE` can be set with the following command:
 
-### Troubleshooting
+```bash
+docker run -td --name aind --privileged -p 8080:8080 -e "WEBMODE=1" -v /lib/modules:/lib/modules:ro aind/aind
+docker exec aind cat /home/user/.vnc/passwdfile
+```
 
-* `docker logs aind`
-* `docker exec -it aind systemctl status anbox-container-manager`
-* `docker exec -it aind ps -ef`
-* `docker exec -it aind cat /var/lib/anbox/logs/console.log`
+The container will be accessible via the browser at http://localhost:8080/vnc.html
+
+### Docker Compose
+
+To bring the container up simply run
+```
+docker-compose up -d
+```
+the vnc password can be gotten with
+```
+docker-compose exec aind cat /home/user/.vnc/passwdfile
+```
+you can check how far it is with
+```
+docker-compose exec aind ps -ef
+```
 
 ### Kubernetes
 
@@ -111,22 +123,14 @@ The manifest is known to work on:
   - Kubernetes 1.17.0, Ubuntu 19.10, Kernel 5.3.0-46-generic, containerd 1.3.2
   - **NOTE**: Requires `docker exec kind-control-plane mount -o remount,rw /sys`
 
-### Docker Compose
-
-To bring the container up simply run
-```
-docker-compose up -d
-```
-the vnc password can be gotten with
-```
-docker-compose exec aind cat /home/user/.vnc/passwdfile
-```
-you can check how far it is with
-```
-docker-compose exec aind ps -ef
-```
-
 ## Tips
+
+### Troubleshooting
+
+* `docker logs aind`
+* `docker exec -it aind systemctl status anbox-container-manager`
+* `docker exec -it aind ps -ef`
+* `docker exec -it aind cat /var/lib/anbox/logs/console.log`
 
 ### adb
 
