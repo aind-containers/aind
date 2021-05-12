@@ -90,6 +90,8 @@ RUN apt-get update && \
   dbus dbus-user-session systemd systemd-container systemd-sysv \
 # X11
   xvfb x11vnc \
+# noVNC
+  websockify novnc \
 # WM
   fvwm xterm \
 # debug utilities
@@ -113,11 +115,14 @@ ADD src/anbox-container-manager.service /lib/systemd/system/anbox-container-mana
 RUN systemctl enable anbox-container-manager
 ADD src/unsudo /usr/local/bin
 ADD src/docker-2ndboot.sh  /home/user
+
+ENV WEBMODE 0
 # Usage: docker run --rm --privileged -v /:/host --entrypoint bash aind/aind -exc "cp -f /install-kmod.sh /host/aind-install-kmod.sh && cd /host && chroot . /aind-install-kmod.sh"
 ADD hack/install-kmod.sh /
 VOLUME /var/lib/anbox
 ENTRYPOINT ["/docker-entrypoint.sh", "unsudo"]
 EXPOSE 5900
+EXPOSE 8080
 HEALTHCHECK --interval=15s --timeout=10s --start-period=60s --retries=5 \
   CMD ["pgrep", "-f", "org.anbox.appmgr"]
 CMD ["/home/user/docker-2ndboot.sh"]

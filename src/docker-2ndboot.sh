@@ -50,6 +50,12 @@ if [ $INHERIT_DISPLAY -eq 0 ]; then
     fvwm &
 fi
 
+if [ $WEBMODE = "1" ]; then
+    echo "running websockify..."
+    websockify -D --web /usr/share/novnc/ 0.0.0.0:8080 127.0.0.1:5900
+    echo "websockify -> $?"
+fi
+
 if ! systemctl is-system-running --wait; then
     systemctl status --no-pager -l anbox-container-manager
     journalctl -u anbox-container-manager --no-pager -l
@@ -78,6 +84,7 @@ if ls /apk.d/*.apk; then
 fi
 
 [ -n "${POST_SESSION_SCRIPT:-}" ] && . $POST_SESSION_SCRIPT
+
 
 # done
 figlet "Ready"

@@ -63,6 +63,12 @@ sudo modprobe binder_linux
 
 ```bash
 docker run -td --name aind --privileged -p 5900:5900 -v /lib/modules:/lib/modules:ro aind/aind
+```
+
+to run the container with novnc support the environment variable WEBMODE canbe set with the following command
+the container will be accessible via the browser at http://localhost:8080/vnc.html
+```bash
+docker run -td --name aind --privileged -p 8080:8080 -e "WEBMODE=1" -v /lib/modules:/lib/modules:ro aind/aind
 docker exec aind cat /home/user/.vnc/passwdfile
 ```
 
@@ -158,7 +164,6 @@ aind is expected to be used in conjunction with encryption of the client device,
 
 ## TODOs
 * Map different UID range per containers
-* Support remote connection from phones and tablets, ideally using Web browsers (noVNC?).
 * Better touch screen experience
 * Redirect camera, notifications, ...
 
