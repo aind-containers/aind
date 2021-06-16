@@ -11,4 +11,6 @@ services:
         - '8080:8080'
       volumes:
         - '/lib/modules:/lib/modules:ro'
-        - './passwd:/home/user/.vnc'
+        - 'dot-vnc:/home/user/.vnc'
+volumes:
+  dot-vnc:
