@@ -2,7 +2,7 @@ name: Main
 on: [push, pull_request]
 jobs:
   test-main:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
 # host info
