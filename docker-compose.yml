@@ -1,7 +1,7 @@
 version: '3'
 services:
     aind:
-      image: 'aind/aind'
+      image: 'ghcr.io/aind-containers/aind'
       privileged: true
       tty: true
       environment:
