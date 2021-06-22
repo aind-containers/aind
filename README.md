@@ -11,7 +11,9 @@ AinD launches Android apps in Docker, by nesting [Anbox](https://anbox.io/) cont
 
 Unlike VM-based similar projects, AinD can be executed on IaaS instances without support for nested virtualization.
 
-Docker Hub: [`aind/aind`](https://hub.docker.com/r/aind/aind)
+GHCR: `ghcr.io/aind-containers/aind`
+
+:warning: Docker Hub image [`aind/aind`](https://hub.docker.com/r/aind/aind) is no longer updated. Please use `ghcr.io/aind-containers/aind` image on GHCR.
 
 ## Purposes
 * Anti-theft (see [FAQ](#faq))
@@ -64,7 +66,7 @@ sudo modprobe binder_linux
 ### Docker
 #### VNC
 ```bash
-docker run -td --name aind --privileged -p 5900:5900 -v /lib/modules:/lib/modules:ro aind/aind
+docker run -td --name aind --privileged -p 5900:5900 -v /lib/modules:/lib/modules:ro ghcr.io/aind-containers/aind
 docker exec aind cat /home/user/.vnc/passwdfile
 ```
 
@@ -79,7 +81,7 @@ If the application manager doesn't shown up on the VNC screen, try `docker run .
 To run the container with [noVNC](https://novnc.com/) support, the environment variable `WEBMODE` can be set with the following command:
 
 ```bash
-docker run -td --name aind --privileged -p 8080:8080 -e "WEBMODE=1" -v /lib/modules:/lib/modules:ro aind/aind
+docker run -td --name aind --privileged -p 8080:8080 -e "WEBMODE=1" -v /lib/modules:/lib/modules:ro ghcr.io/aind-containers/aind
 docker exec aind cat /home/user/.vnc/passwdfile
 ```
 
@@ -184,7 +186,7 @@ aind is expected to be used in conjunction with encryption of the client device,
 * The Anbox patches ([`./src/patches/anbox/*.patch`](./src/patches/anbox)) are licensed under the terms of [the GNU General Public License, Version 3](https://github.com/anbox/anbox/blob/master/COPYING.GPL), corresponding to [Anbox](https://github.com/anbox/anbox) itself.
 
 ### Binary image
-* [The `aind/aind` image on Docker Hub](https://hub.docker.com/r/aind/aind) (built from [`./Dockerfile`](./Dockerfile)) contains the binaries of several free software.
+* The `ghcr.io/aind-containers/aind` image on GitHub Container Registry (built from [`./Dockerfile`](./Dockerfile)) contains the binaries of several free software.
   * Anbox (`/usr/local/bin/anbox`): [the GNU General Public License, Version 3](https://github.com/anbox/anbox/blob/master/COPYING.GPL)
   * Firefox (`/apk-pre.d/fennec-*.apk`): [the Mozilla Public License 2](https://www.mozilla.org/en-US/about/legal/eula/)
   * F-Droid (`/apk-pre.d/FDroid.apk`): [the GNU General Public License, Version 3](https://gitlab.com/fdroid/fdroidclient/-/blob/master/LICENSE)

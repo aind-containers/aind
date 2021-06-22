@@ -2,7 +2,7 @@
 #
 # See README.md for the clusters known to work with.
 #
-# NOTE: replace "aind/aind:latest" with "aind/aind@sha256:<digest>" for reproducible deployment.
+# NOTE: replace "ghcr.io/aind-containers/aind:latest" with "ghcr.io/aind-containers/aind@sha256:<digest>" for reproducible deployment.
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -22,7 +22,7 @@ spec:
     spec:
       initContainers:
       - name: install-kmod
-        image: aind/aind:latest
+        image: ghcr.io/aind-containers/aind:latest
         command: ["/bin/bash"]
         args: ["-exc", "cp -f /install-kmod.sh /host/tmp/aind-install-kmod.sh && cd /host && chroot . bash /tmp/aind-install-kmod.sh"]
         securityContext:
@@ -34,14 +34,14 @@ spec:
  # Required by anbox session-manager.
  # https://github.com/aind-containers/aind/issues/21 https://github.com/containerd/containerd/issues/3221 https://github.com/moby/moby/issues/24000#issuecomment-613194003
       - name: fix-sandbox-sysfs
-        image: aind/aind:latest
+        image: ghcr.io/aind-containers/aind:latest
         command: ["/bin/bash"]
         args: ["-exc", "mount -o remount,rw /sys"]
         securityContext:
           privileged: true
       containers:
       - name: aind
-        image: aind/aind:latest
+        image: ghcr.io/aind-containers/aind:latest
         tty: true
         securityContext:
           privileged: true
